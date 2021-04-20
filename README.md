@@ -84,9 +84,9 @@ col8	POSTGAP_PSTRANDEDNESS	comma separated values: positive strand count, total 
 col9	POSTGAP_NSTRANDEDNESS	comma separated values: negative strand count, total postgap read count, neg proportion
 col10	GAP_LENGTH				length (bp) of deletion (gap, depth zero to zero; col3-col2)
 col11	CONFIDENCE				[low], [medium], or [high] probability of being an insertion site
-							low - sites where at least one flanking depth is >2
-							medium - flanking depths are both >2
-							high - flanking depths are both >2, and both flanks have 100% opposing strandedness, e.g. if one flank has 100% of reads aligning to the +strand, then 100% of reads from the other align to the -strand (depending on depth, these are almost definitively insertion sites)
+							low - sites where at least one flanking depth is >1
+							medium - flanking depths are both >1
+							high - flanking depths are both >1, and both flanks have 100% opposing strandedness, e.g. if one flank has 100% of reads aligning to the +strand, then 100% of reads from the other align to the -strand (depending on depth, these are almost definitively insertion sites)
 								*if using shear (WGS) data, 'high' confidence is not as meaningful (and anyways, very unlikely)
 ```
 #
