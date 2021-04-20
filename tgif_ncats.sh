@@ -30,7 +30,7 @@ REQUIRED:
 	-t	INT	number of threads to GNU parallel over
 	-f	READS	sequencing reads fasta/q file run NCATS enriched library
 	-r	FASTA	fasta reference of target organism
-OPTIONAL:
+OPTIONAL (but HIGHLY recommended):
 	-i	FASTA	fasta of plasmid/inserted gene(s)
 	-s	y/n		output sorted bam of downselected reads for IGV use [n]
 	-p	y/n		generate read pileup png with R/ggplot2 per insertion site [n]
@@ -61,9 +61,9 @@ TGIF OUTPUT FORMAT (insertions_filtered.tgif), line 1 contains column headers
 	col9	POSTGAP_NSTRANDEDNESS	comma separated values: negative strand count, total postgap read count, neg proportion
 	col10	GAP_LENGTH		length (bp) of deletion (gap, depth zero to zero; col3-col2)
 	col11	CONFIDENCE		[low], [medium], or [high] probability of being an insertion site
-								low - sites where at least one flanking depth is >2
-								medium - flanking depths are both >2
-								high - flanking depths are both >2, and both flanks have 100% opposing strandedness, e.g. if one flank has 100% of reads aligning to the +strand, then 100% of reads from the other align to the -strand (depending on depth, these are almost definitively insertion sites)
+								low - sites where at least one flanking depth is >1
+								medium - flanking depths are both >1
+								high - flanking depths are both >1, and both flanks have 100% opposing strandedness, e.g. if one flank has 100% of reads aligning to the +strand, then 100% of reads from the other align to the -strand (depending on depth, these are almost definitively insertion sites)
 						*if using shear (WGS) data, 'high' confidence is not as meaningful
 
 EOF
@@ -190,25 +190,19 @@ fi
 target="$outdir/combined_insert_ref.fa"
 cp "$REF" "$target"
 cat "$INSERT" >> "$target"
-insert_name=$(head -1 "$INSERT" | sed -e 's/^>//' -e 's/ .*//')
+insert_name=$(head -1 "$INSERT" | sed 's/^>//')
 #	map reads to insertion sequence
 query="$outdir/reads.fasta"
 bnt=$(basename "$target")
 if [[ ! -f "$target.idx" ]]; then	# make index of target
 	echo "indexing $bnt" >> "$outdir/log"
 	>&2 echo "indexing $bnt"
-	$bin/minimap2 -t "$THREADS" "$target" -d "$target.idx" 2> "$outdir/error.log"
-	if [[ "$?" != "0" ]]; then
-		cat "$outdir/error.log"; exit
-	fi
+	$bin/minimap2 -t "$THREADS" "$target" -d "$target.idx" 2> /dev/null
 fi
 echo "mapping $total_reads reads to $bnt" >> "$outdir/log"
 >&2 echo "mapping $total_reads reads to $bnt"
 if [[ ! -f "$outdir/alignments/reads_to_both.paf" ]]; then
-	$bin/minimap2 -x map-ont -t "$THREADS" "$target.idx" "$query" > "$outdir/alignments/reads_to_both.paf" 2> "$outdir/error.log"
-	if [[ "$?" != "0" ]]; then
-		cat "$outdir/error.log"; exit
-	fi
+	$bin/minimap2 -x map-ont -t "$THREADS" "$target.idx" "$query" > "$outdir/alignments/reads_to_both.paf" 2> /dev/null
 fi
 uniq_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_to_both.paf")
 percent=$(printf "$uniq_count" | awk -v total_reads="$total_reads" '{printf("%.2f",100*($0/total_reads))}')
@@ -225,7 +219,7 @@ i_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_
 echo "	mapped ${i_count} to (-i)" >> "$outdir/log"
 >&2 echo "	mapped ${i_count} to (-i)"
 grep -vP "\t$insert_name\t" "$outdir/alignments/reads_to_both.paf" > "$outdir/alignments/reads_to_r.paf"
-r_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_to_r.paf")
+r_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_to_i.paf")
 echo "	mapped ${r_count} to (-r)" >> "$outdir/log"
 >&2 echo "	mapped ${r_count} to (-r)"
 # index insert aligned read headers (col1), then only print alignments of these reads found in reference
@@ -270,13 +264,13 @@ if [[ "$SAMTOOLS" == "y" ]]; then
 	if [[ ! -f "$outdir/alignments/downselected_reads_to_r.sorted.bam.bai" ]]; then
 		$bin/samtools view -@ "$mT" -hb "$outdir/alignments/downselected_reads_to_r.sam" > "$outdir/alignments/downselected_reads_to_r.bam"
 		# index the sam for tablet/IGV
-		$bin/samtools sort -@ "$mT" -o "$outdir/alignments/downselected_reads_to_r.sorted.bam" "$outdir/alignments/downselected_reads_to_r.bam"
+		$bin/samtools sort -@ "$mT" "$outdir/alignments/downselected_reads_to_r.bam" "$outdir/alignments/downselected_reads_to_r.sorted"
 		$bin/samtools index "$outdir/alignments/downselected_reads_to_r.sorted.bam"
 	fi
 	if [[ ! -f "$outdir/alignments/downselected_reads_to_i.sorted.bam.bai" ]]; then
 		$bin/samtools view -@ "$mT" -hb "$outdir/alignments/downselected_reads_to_i.sam" > "$outdir/alignments/downselected_reads_to_i.bam"
 		# index the sam for tablet/IGV
-		$bin/samtools sort -@ "$mT" -o "$outdir/alignments/downselected_reads_to_i.sorted.bam" "$outdir/alignments/downselected_reads_to_i.bam"
+		$bin/samtools sort -@ "$mT" "$outdir/alignments/downselected_reads_to_i.bam" "$outdir/alignments/downselected_reads_to_i.sorted"
 		$bin/samtools index "$outdir/alignments/downselected_reads_to_i.sorted.bam"
 	fi
 	# clean up
@@ -455,28 +449,32 @@ echo "filter1, checking depths of gap flanks..." >> "$outdir/log"
 #	col4	GAP_END			position in reference where gap ends (3' end of gap, where depth jumps dramatically) {from forward.dep}
 #	col5	POSTGAP_DEPTH	depth of 'position in col4 plus 1'
 #	col6	GAP_LENGTH		length (bp) of deletion (gap, depth zero to zero; col3-col2)
+
+########################	OLD START	#################################
 #	col7	CONFIDENCE		[wee] or [low] probability of being an insertion site
-#								wee - probably not worth following up (if one flanking position has >2 depth)
+#								wee - probably not worth following up (if only one flanking position has >2 depth)
 #								low - sites where both flanking depths are >2
+########################	OLD END		#################################
+
+# 20210420 change
+#	col7	CONFIDENCE		[wee] or [low] probability of being an insertion site
+#								wee - both flanking positions has depth==1
+#								low - sites where at least one flanking depth is >1
+#								experimental evidence shows that even a site where one of the flanking depths == 1 is a validated insertion site (20201029_15-16_merge.fastq)
 
 # assign [wee] and [low] prob to sites
 awk -F'\t' '{
-	# low prob sites (will include medium and high prob sites at this point)
-	if($3>2){
-		if($5>2){
-			printf("%s\t%s\n",$0,"low"); next;
+	# wee prob sites
+	if($3==1){
+		if($5==1){
+			printf("%s\t%s\n",$0,"wee"); next;
 		}
 	};
-	# wee prob sites (5-prime evidence)
-	if($3>2){
-		if($5==1){printf("%s\t%s\n",$0,"wee"); next};
-		if($5==2){printf("%s\t%s\n",$0,"wee"); next};
-	};
-	# wee prob sites (3-prime evidence)
-	if($5>2){
-		if($3==1){printf("%s\t%s\n",$0,"wee"); next};
-		if($3==2){printf("%s\t%s\n",$0,"wee"); next};
-	}
+	# low prob sites (will include medium and high prob sites at this point)
+	#	5-prime evidence
+	if($3>1){printf("%s\t%s\n",$0,"low"); next};
+	# 	3-prime evidence
+	if($5>1){printf("%s\t%s\n",$0,"low"); next};
 }' "$outdir/insertions_all.tsv" > "$outdir/insertions_filter1.tsv"
 # exit if file is empty
 if [[ ! -s "$outdir/insertions_filter1.tsv" ]]; then
@@ -570,7 +568,6 @@ fi
 echo "" >> "$outdir/log"
 >&2 echo ""
 cat "$outdir/insertions_filtered.tgif"
-
 
 
 
