@@ -194,8 +194,28 @@ These digested fragments will be more amenable for ONT library prep due to the r
 6. H. Wickham. [ggplot2](https://ggplot2.tidyverse.org/): Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
 7. Untergasser A, Cutcutache I, Koressaar T, Ye J, Faircloth BC, Remm M and Rozen SG. [Primer3](http://primer3.org/manual.html)--new capabilities and interfaces. Nucleic Acids Res. 2012 Aug 1;40(15):e115.
 
+### Copyright
 
+##############################################################################################
+Copyright 2022 The Johns Hopkins University Applied Physics Laboratory LLC
+All rights reserved.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so.
 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+OR OTHER DEALINGS IN THE SOFTWARE.
 
+### Acknowledgements
 
+##############################################################################################
 
+This software tool was was supported by the DARPA Advanced Plant Technologies program (HR001118S0005). 
+The views, opinions and/or findings expressed are those of the author and should not be interpreted 
+as representing the official views or policies of the Department of Defense or the U.S. Government.
