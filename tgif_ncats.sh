@@ -132,19 +132,18 @@ runtime=$(date +"%Y%m%d%H%M%S%N")
 bni=$(basename "$INSERT")
 bnr=$(basename "$REF")
 bn=$(basename "$FASTFILE")
-fastdir=$(dirname "$FASTFILE")
 
 
 
 # move outputs to FASTFILE input dir
-outdir="$fastdir/tgif_ncats-$bn"
+outdir="tgif_ncats-$bn"
 
 
 
 
 # only run if the 'mv' directory does not already exist
 #	this assumes the '.dep' files are already present for filtering
-#	please run 'rm -r "$fastdir/tgif_ncats-$bn"' if you want to re-run alignments etc 
+#	please run 'rm -r "$outdir"' if you want to re-run alignments etc 
 if [[ ! -d "$outdir" ]]; then
 	mkdir -p "$outdir/alignments"
 	mkdir -p "$outdir/sortmp"
