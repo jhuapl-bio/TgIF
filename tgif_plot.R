@@ -4,8 +4,6 @@ library(ggplot2)
 args = commandArgs(trailingOnly=TRUE)
 input<-args[1];	# position.data file
 
-#input <- '/home/playera1/APL/Shared_Documents/Documents/DARPA-LiSTENS/fy20/transgene_stuff/tgif_algorithm_dev_3cg2/tgif-20200531_FLOWCELLID_3cg2_shear_fastq_pass.fastq/plots/Chr08_33451539_33451905.data'
-
 d <- read.table(input, header=F, sep='\t')
 
 
