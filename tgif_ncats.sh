@@ -20,7 +20,8 @@ NOTES:
 DEPENDENCIES:
 	GNU Parallel
 	minimap2
-		please symlink the minimap2 to 'tgif/bin/' (see Installation section of README)
+ 	samtools
+		*please symlink the minimap2 and samtools to 'tgif/bin/' (see Installation section of README)
 		e.g. ln -s $fullpathto/minimap2/minimap2 $fullpathto/tgif/bin/
 
 HELP/OUTFMT:
@@ -30,8 +31,8 @@ REQUIRED:
 	-t	INT	number of threads to GNU parallel over
 	-f	READS	sequencing reads fasta/q file run NCATS enriched library
 	-r	FASTA	fasta reference of target organism
-OPTIONAL (but HIGHLY recommended):
 	-i	FASTA	fasta of plasmid/inserted gene(s)
+OPTIONAL:
 	-s	y/n		output sorted bam of downselected reads for IGV use [n]
 	-p	y/n		generate read pileup png with R/ggplot2 per insertion site [n]
 
@@ -80,7 +81,7 @@ absolute_path_of_script="${absolute_path_x%x}"
 scriptdir=$(dirname "$absolute_path_of_script")
 if [[ $? != 0 ]]; then
 	>&2 echo "Please locate the function 'dirname' and symlink it to this script's bin."
-	>&2 echo "example: ln -s /usr/bin/dirname /full/path/to/cinder/bin/dirname"
+	>&2 echo "example: ln -s /usr/bin/dirname /full/path/to/tgif/bin/dirname"
 	exit
 fi
 bin="$scriptdir/bin"
@@ -107,16 +108,8 @@ if [[ ! -f "$FASTFILE" ]]; then printf "%s\n" "The input (-f) $FASTFILE file doe
 if [[ -z "$REF" ]]; then printf "%s\n" "Please specify reference fasta (-r)."; exit; fi
 if [[ ! -f "$REF" ]]; then printf "%s\n" "The input (-r) $REF file does not exist."; exit; fi
 # make sure user knows that running without the insert sequence as a filter is NOT advised
-if [[ -z "$INSERT" ]]; then
-	>&2 echo "You did not specify an insert sequence for filtering (-i)."
-	>&2 echo "This is not advised, and will likely lead to incorrect insertion point identification."
-	read -p "Do you want to continue? [y/n] " cont
-	if [[ "$cont" == "y" ]]; then >&2 echo "too bad, terminating"; exit; fi
-	if [[ "$cont" == "n" ]]; then >&2 echo "terminating"; exit; fi
-	if [[ "$cont" != "y" && "$cont" != "n" ]]; then >&2 echo "that's not an expected answer, terminating"; exit; fi
-else
-	if [[ ! -f "$INSERT" ]]; then printf "%s\n" "The input (-i) '$INSERT' file does not exist."; exit; fi
-fi
+if [[ -z "$INSERT" ]]; then printf "%s\n" "Please specify fasta containing vector/plasmid sequence(s) (-i)."; exit; fi
+if [[ ! -f "$INSERT" ]]; then printf "%s\n" "The input (-i) $INSERT file does not exist."; exit; fi
 if [[ -z "$SAMTOOLS" ]]; then SAMTOOLS="n"; fi
 case "$SAMTOOLS" in
 	y) echo "testing" > /dev/null;;
