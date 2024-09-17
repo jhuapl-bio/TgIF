@@ -13,7 +13,7 @@ absolute_path_of_script="${absolute_path_x%x}"
 scriptdir=$(dirname "$absolute_path_of_script")
 if [[ $? != 0 ]]; then
 	>&2 echo "Please locate the function 'dirname' and symlink it to this script's bin."
-	>&2 echo "example: ln -s /usr/bin/dirname /full/path/to/cinder/bin/dirname"
+	>&2 echo "example: ln -s /usr/bin/dirname /full/path/to/tgif/bin/dirname"
 	exit
 fi
 bin="$scriptdir/bin"
