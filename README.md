@@ -60,7 +60,7 @@ Required inputs:
 	-t	INT		number of threads to GNU parallel over
 	-f	FASTA/Q		sequencing reads file (ideally from an ONT nCATS enriched library
 	-r	FASTA		fasta reference of target organism (may contain multiple sequences, no linebreaks within each sequence)
-	-i	FASTA		fasta of plasmid/inserted gene(s) (may only contain a single sequence, no linebreaks within the sequence)
+	-i	FASTA		fasta of plasmid or inserted gene (may only contain a single sequence, no linebreaks within the sequence)
 ```
 
 Optional inputs:
