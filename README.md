@@ -23,22 +23,32 @@ apt install parallel	#required
 apt install primer3		#optional
 ```
 
-Required dependencies:
+Dependencies:
 - [GNU Parallel](https://www.gnu.org/software/parallel/)<sup>[\[2\]](https://github.com/jhuapl-bio/TgIF#refs)</sup>
 - [minimap2](https://github.com/lh3/minimap2#install)<sup>[\[3\]](https://github.com/jhuapl-bio/TgIF#refs)</sup>
-
-Optional dependencies:
 - [samtools](https://samtools.github.io/bcftools/howtos/install.html)<sup>[\[4\]](https://github.com/jhuapl-bio/TgIF#refs)</sup>
 - [R](https://cran.r-project.org/)<sup>[\[5\]](https://github.com/jhuapl-bio/TgIF#refs)</sup> with [ggplot2](https://ggplot2.tidyverse.org/)<sup>[\[6\]](https://github.com/jhuapl-bio/TgIF#refs)</sup> package (if using plotting module)
 - [Primer3](http://primer3.org/manual.html)<sup>[\[7\]](https://github.com/jhuapl-bio/TgIF#refs)</sup> (if using the Primer3 module, symlink the `primer3_core` command to bin)
 
 After installing the above dependencies symlink executables to tgif's `bin` directory. An example for minimap2 using `which` to find the executable path from the globally accessible command, is below:
 
-Symlink (`ln -s`)example:
+Symlink (`ln -s`) executables:
 ```
-mm2path=$(which minimap2)
+exepath=$(which minimap2)
 binpath="/data/apps/tgif/bin/"
-ln -s $mm2path $binpath
+ln -s $exepath $binpath
+
+exepath=$(which primer3_core)
+binpath="/data/apps/tgif/bin/"
+ln -s $exepath $binpath
+
+exepath=$(which Rscript)
+binpath="/data/apps/tgif/bin/"
+ln -s $exepath $binpath
+
+exepath=$(which samtools)
+binpath="/data/apps/tgif/bin/"
+ln -s $exepath $binpath
 ```
 ###  <a name="inputs"></a> INPUT ARGUMENTS & SIMPLE EXAMPLE
 
@@ -50,13 +60,13 @@ Help messages:
 Required inputs:
 ```
 	-t	INT		number of threads to GNU parallel over
-	-f	FASTA/Q	sequencing reads file (ideally from an ONT nCATS enriched library
-	-r	FASTA	fasta reference of target organism (may contain multiple sequences, no linebreaks within each sequence)
+	-f	FASTA/Q		sequencing reads file (ideally from an ONT nCATS enriched library
+	-r	FASTA		fasta reference of target organism (may contain multiple sequences, no linebreaks within each sequence)
+	-i	FASTA		fasta of plasmid/inserted gene(s) (may only contain a single sequence, no linebreaks within the sequence)
 ```
 
 Optional inputs:
 ```
-	-i	FASTA	fasta of plasmid/inserted gene(s), HIGHLY recommended (may only contain a single sequence, no linebreaks within the sequence)
 	-s	y/n		output sorted bam of downselected reads for IGV use
 	-p	y/n		generate read pileup png with R/ggplot2 per insertion site
 ```
