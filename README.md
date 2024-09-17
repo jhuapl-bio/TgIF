@@ -19,8 +19,6 @@ Pseudocode:
 Clone this github repository in a desired local directory and install dependencies available though the apt repo:
 ```
 git clone https://github.com/jhuapl-bio/TgIF
-apt install parallel	#required
-apt install primer3		#optional
 ```
 
 Dependencies:
