@@ -211,7 +211,7 @@ i_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_
 echo "	mapped ${i_count} to (-i)" >> "$outdir/log"
 >&2 echo "	mapped ${i_count} to (-i)"
 grep -vP "\t$insert_name\t" "$outdir/alignments/reads_to_both.paf" > "$outdir/alignments/reads_to_r.paf"
-r_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_to_i.paf")
+r_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_to_r.paf")
 echo "	mapped ${r_count} to (-r)" >> "$outdir/log"
 >&2 echo "	mapped ${r_count} to (-r)"
 # index insert aligned read headers (col1), then only print alignments of these reads found in reference
