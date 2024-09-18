@@ -308,13 +308,13 @@ fdep()
 		ilen[$6]=$7;
 		ireads[$6]+=1;
 		for(i=$8+1;i<=$9+1;i++){
-			dep[$6][i]+=1;
+			dep[$6","i]+=1;
 		};
 	}END{
 		for(chr in ilen){
 			for(p=1;p<=ilen[chr]+1;p++){
-				if(dep[chr][p]!=""){
-					printf("%s\t%s\t%s\t%s\n",chr,p,dep[chr][p],z);
+				if(dep[chr","p]!=""){
+					printf("%s\t%s\t%s\t%s\n",chr,p,dep[chr","p],z);
 					z=0;
 				}else{
 					z++;
@@ -339,13 +339,13 @@ rdep()
 		ilen[$6]=$7;
 		ireads[$6]+=1;
 		for(i=$8+1;i<=$9+1;i++){
-			dep[$6][i]+=1
+			dep[$6","i]+=1
 		};
 	}END{
 		for(chr in ilen){
 			for(p=ilen[chr]+1;p>=1;p--){
-				if(dep[chr][p]!=""){
-					printf("%s\t%s\t%s\t%s\n",chr,p,dep[chr][p],z);
+				if(dep[chr","p]!=""){
+					printf("%s\t%s\t%s\t%s\n",chr,p,dep[chr","p],z);
 					z=0;
 				}else{
 					z++;
@@ -403,24 +403,27 @@ awk -F'\t' '{
 	if(NR==FNR){
 		if($4!=0){
 			if($3>0){
-				fpos[$1]=$2; fdep[$1][$2]=$3; fgap[$1][$2]=$4;
+				fpos[$1]=$2; fdep[$1","$2]=$3; fgap[$1","$2]=$4;
 			}
 		}
 	}else{
 		if($4!=0){
 			if($3>0){
-				rdep[$1][$2]=$3;
-				rgap[$1][$2]=$4;
+				rdep[$1","$2]=$3;
+				rgap[$1","$2]=$4;
 			}
 		}
 	}
 }END{
 	for(chr in fpos){
-		for(pos in fdep[chr]){
-			expected_rpos=pos-(fgap[chr][pos]+1);
-			if(fgap[chr][pos]==rgap[chr][expected_rpos]){
-				printf("%s\t%s\t%s\t%s\t%s\t%s\n",chr,expected_rpos,rdep[chr][expected_rpos],pos,fdep[chr][pos],fgap[chr][pos]);
-			}
+		for(pos in fdep){
+  			split(pos, arr, ",");
+     			if(arr[1]==chr){
+				expected_rpos=arr[2]-(fgap[chr","arr[2]]+1);
+				if(fgap[chr","arr[2]]==rgap[chr","expected_rpos]){
+					printf("%s\t%s\t%s\t%s\t%s\t%s\n",chr,expected_rpos,rdep[chr","expected_rpos],arr[2],fdep[chr","arr[2]],fgap[chr","arr[2]]);
+				}
+    			}
 		}
 	}
 }'  "$outdir/alignments/forward.dep" "$outdir/alignments/reverse.dep" > "$outdir/insertions_all.tsv"
