@@ -40,3 +40,7 @@ while read f; do
 	# run plot script
 	$bin/Rscript $scriptdir/tgif_plot.R "$outdir/plots/${header}_${gapstart}_${gapend}.data"
 done < <(tail -n+2 "$outdir/insertions_filtered.tgif")
+
+# make compress tarball of plots
+tar -cf insertion_site_plots.tar "$outdir/plots"
+gzip insertion_site_plots.tar.gz
