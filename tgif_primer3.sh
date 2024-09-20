@@ -194,4 +194,4 @@ parallel --arg-file "$workdir/parallel.p3" --jobs="$THREADS" p3
 rm $RLB
 
 # make tar of entire output folder
-tar -cf primer3.tar $workdir
+tar -cf primer3.tar -C $workdir .
