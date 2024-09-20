@@ -43,4 +43,4 @@ done < <(tail -n+2 "$outdir/insertions_filtered.tgif")
 
 # make compress tarball of plots
 tar -cf insertion_site_plots.tar "$outdir/plots"
-gzip insertion_site_plots.tar.gz
+gzip insertion_site_plots.tar
