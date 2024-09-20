@@ -84,7 +84,7 @@ p3()
 	fi
 	echo "	finding primers for site at $HEADER between $temp_start and $temp_end" >> "$workdir/log"
 	>&2 echo "	finding primers for site at $HEADER between $temp_start and $temp_end"
-	TEMPLATE=$(grep -A1 "^>$HEADER" "$REF" | tail -1 | cut -c${temp_start}-${temp_end})
+	TEMPLATE=$(grep -A1 "^>$HEADER" "$RLB" | tail -1 | cut -c${temp_start}-${temp_end})
 
 
 # do NOT tab over EOF or anything between them...
@@ -112,7 +112,7 @@ EOF
 
 
 }
-export bin workdir REF GAPCUTOFF
+export bin workdir RLB GAPCUTOFF
 export -f p3
 
 
@@ -172,7 +172,9 @@ indir=$(dirname "$TGIF")
 workdir="$indir/primer3_files"
 mkdir -p "$workdir"
 
-
+# ensure REF has no linebreaks among sequences
+RLB="ref.rlb.fa"
+awk -f $bin/fasta_rmlinebreaks.awk $REF > $RLB
 
 
 
@@ -187,15 +189,5 @@ find "$workdir" -name "tgif_*" -exec du -b {} + | sort -r | cut -f2 > "$workdir/
 echo "finding primers with primer3_core for $TOTAL_SITES total sites:" > "$workdir/log"
 >&2 echo "finding primers with primer3_core for $TOTAL_SITES total sites:"
 parallel --arg-file "$workdir/parallel.p3" --jobs="$THREADS" p3
-
-
-
-
-
-
-
-
-
-
 
 
