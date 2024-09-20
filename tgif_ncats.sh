@@ -256,16 +256,16 @@ if [[ "$SAMTOOLS" == "y" ]]; then
 	# convert to bam and sort
 	#samtools="/data/apps/bin/samtools-1.2"
 	if [[ ! -f "$outdir/alignments/downselected_reads_to_r.sorted.bam.bai" ]]; then
-		$bin/samtools view -@ "$mT" -hb "$outdir/alignments/downselected_reads_to_r.sam" > "$outdir/alignments/downselected_reads_to_r.bam"
+		$bin/samtools view -@ "$THREADS" -hb "$outdir/alignments/downselected_reads_to_r.sam" > "$outdir/alignments/downselected_reads_to_r.bam"
 		# index the sam for tablet/IGV
-		$bin/samtools sort -@ "$mT" "$outdir/alignments/downselected_reads_to_r.bam" "$outdir/alignments/downselected_reads_to_r.sorted"
-		$bin/samtools index "$outdir/alignments/downselected_reads_to_r.sorted.bam"
+		$bin/samtools sort -@ "$THREADS" "$outdir/alignments/downselected_reads_to_r.bam" -o "$outdir/alignments/downselected_reads_to_r.sorted.bam"
+		$bin/samtools index -@ "$THREADS" "$outdir/alignments/downselected_reads_to_r.sorted.bam"
 	fi
 	if [[ ! -f "$outdir/alignments/downselected_reads_to_i.sorted.bam.bai" ]]; then
-		$bin/samtools view -@ "$mT" -hb "$outdir/alignments/downselected_reads_to_i.sam" > "$outdir/alignments/downselected_reads_to_i.bam"
+		$bin/samtools view -@ "$THREADS" -hb "$outdir/alignments/downselected_reads_to_i.sam" > "$outdir/alignments/downselected_reads_to_i.bam"
 		# index the sam for tablet/IGV
-		$bin/samtools sort -@ "$mT" "$outdir/alignments/downselected_reads_to_i.bam" "$outdir/alignments/downselected_reads_to_i.sorted"
-		$bin/samtools index "$outdir/alignments/downselected_reads_to_i.sorted.bam"
+		$bin/samtools sort -@ "$THREADS" "$outdir/alignments/downselected_reads_to_i.bam" -o "$outdir/alignments/downselected_reads_to_i.sorted.bam"
+		$bin/samtools index -@ "$THREADS" "$outdir/alignments/downselected_reads_to_i.sorted.bam"
 	fi
 	# clean up
 	rm "$outdir/alignments/downselected_reads_to_r.sam" 2> /dev/null
