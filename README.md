@@ -58,7 +58,8 @@ Help messages:
 Required inputs:
 ```
 	-t	INT		number of threads to GNU parallel over
-	-f	FASTA/Q		sequencing reads file (ideally from an ONT nCATS enriched library
+	-f	FASTA/Q		sequencing reads file (ideally from an ONT nCATS enriched library)
+ 	-x	TYPE		sequencing read type (for minimap2: map-ont, map-pb, sr)
 	-r	FASTA		fasta reference of target organism (may contain multiple sequences, no linebreaks within each sequence)
 	-i	FASTA		fasta of plasmid or inserted gene (may only contain a single sequence, no linebreaks within the sequence)
 ```
@@ -74,7 +75,7 @@ Optional inputs:
 f="/data/project/reads.fastq"
 r="/data/project/org_reference.fna"
 i="/data/project/vector.fasta"
-bash tgif_ncats.sh -t 10 -f "$f" -r "$r" -i "$i"
+bash tgif_ncats.sh -t 10 -f "$f" -x "map-ont" -r "$r" -i "$i"
 ```
 _The output from running the command above will be in a directory named for the basename of `$f`, and in the same parent directory of the input FASTA/Q read file. The output dir would be `/data/project/tgif_ncats-reads.fastq/`, and the primary output file is `insertions_filtered.tgif` which is TSV formatted._
 
