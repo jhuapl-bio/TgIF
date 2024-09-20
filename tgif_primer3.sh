@@ -190,4 +190,8 @@ echo "finding primers with primer3_core for $TOTAL_SITES total sites:" > "$workd
 >&2 echo "finding primers with primer3_core for $TOTAL_SITES total sites:"
 parallel --arg-file "$workdir/parallel.p3" --jobs="$THREADS" p3
 
+# clean up
+rm $RLB
 
+# make tar of entire output folder
+tar -cf primer3.tar $workdir
