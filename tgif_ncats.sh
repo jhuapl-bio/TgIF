@@ -30,6 +30,7 @@ HELP/OUTFMT:
 REQUIRED:
 	-t	INT	number of threads to GNU parallel over
 	-f	READS	sequencing reads fasta/q file run NCATS enriched library
+ 	-x	TYPE	sequencing read type (minimap2 param: map-ont, map-pb, sr)
 	-r	FASTA	fasta reference of target organism
 	-i	FASTA	fasta of plasmid/inserted gene(s)
 OPTIONAL:
@@ -40,7 +41,7 @@ USAGE:
 f="/data/project/reads.fastq"
 r="/data/project/org_reference.fna"
 i="/data/project/vector.fasta"
-bash tgif_ncats.sh -t 10 -f "\$f" -r "\$r" -i "\$i"
+bash tgif_ncats.sh -t 10 -f "\$f" -r "\$r" -i "\$i" -x "map-ont"
 # the output directory will be '/data/project/tgif_ncats-reads.fastq/'
 
 EOF
@@ -87,13 +88,14 @@ fi
 bin="$scriptdir/bin"
 
 # parse args
-while getopts "hot:f:r:i:s:p:" OPTION
+while getopts "hot:f:x:r:i:s:p:" OPTION
 do
 	case $OPTION in
 		h) usage; exit 1 ;;
 		o) outfmt; exit 1 ;;
 		t) THREADS=$OPTARG ;;
 		f) FASTFILE=$OPTARG ;;
+  		x) READTYPE=$OPTARG ;;
 		r) REF=$OPTARG ;;
 		i) INSERT=$OPTARG ;;
 		s) SAMTOOLS=$OPTARG ;;
@@ -189,12 +191,12 @@ bnt=$(basename "$target")
 if [[ ! -f "$target.idx" ]]; then	# make index of target
 	echo "indexing $bnt" >> "$outdir/log"
 	>&2 echo "indexing $bnt"
-	$bin/minimap2 -t "$THREADS" "$target" -d "$target.idx" 2> /dev/null
+	$bin/minimap2 -t "$THREADS" "$target" -d "$target.idx"
 fi
 echo "mapping $total_reads reads to $bnt" >> "$outdir/log"
 >&2 echo "mapping $total_reads reads to $bnt"
 if [[ ! -f "$outdir/alignments/reads_to_both.paf" ]]; then
-	$bin/minimap2 -x map-ont -t "$THREADS" "$target.idx" "$query" > "$outdir/alignments/reads_to_both.paf" 2> /dev/null
+	$bin/minimap2 -x $READTYPE -t "$THREADS" "$target.idx" "$query" > "$outdir/alignments/reads_to_both.paf" 2> /dev/null
 fi
 uniq_count=$(awk -F'\t' '{i[$1]=1}END{print(length(i))}' "$outdir/alignments/reads_to_both.paf")
 percent=$(printf "$uniq_count" | awk -v total_reads="$total_reads" '{printf("%.2f",100*($0/total_reads))}')
@@ -249,8 +251,8 @@ if [[ "$SAMTOOLS" == "y" ]]; then
 		grep -A1 -m1 "^>$readheader" "$outdir/reads.fasta"
 	done > "$query"
 
-	$bin/minimap2 -x map-ont -a -t "$THREADS" "$REF" "$query" > "$outdir/alignments/downselected_reads_to_r.sam" 2> /dev/null
-	$bin/minimap2 -x map-ont -a -t "$THREADS" "$INSERT" "$query" > "$outdir/alignments/downselected_reads_to_i.sam" 2> /dev/null
+	$bin/minimap2 -x $READTYPE -a -t "$THREADS" "$REF" "$query" > "$outdir/alignments/downselected_reads_to_r.sam"
+	$bin/minimap2 -x $READTYPE -a -t "$THREADS" "$INSERT" "$query" > "$outdir/alignments/downselected_reads_to_i.sam"
 	# convert to bam and sort
 	#samtools="/data/apps/bin/samtools-1.2"
 	if [[ ! -f "$outdir/alignments/downselected_reads_to_r.sorted.bam.bai" ]]; then
