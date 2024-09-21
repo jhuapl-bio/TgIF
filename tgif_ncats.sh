@@ -273,6 +273,11 @@ if [[ "$SAMTOOLS" == "y" ]]; then
 
 	rm "$outdir/alignments/downselected_reads_to_i.sam" 2> /dev/null
 	rm "$outdir/alignments/downselected_reads_to_i.bam" 2> /dev/null
+
+	rm $outdir/alignments/reads_to_* 2> /dev/null
+ 
+ 	# make alignment archive (cannot direct to scidap igv since accessory reference genome files are not guaranteed when user-provided genome is used)
+  	tar -cfz alignment_files.tar.gz $outdir/alignments/ .
 fi
 
 
