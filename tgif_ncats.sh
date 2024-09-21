@@ -573,13 +573,7 @@ cat "$outdir/insertions_filtered.tgif"
 
 
 
-
-
-
-
-
-
-
-
-
+# clean up large intermediate files not captured for scidap output
+rm "$outdir/reads.fasta" 2> /dev/null
+rm "$outdir/combined_insert_ref.fa" 2> /dev/null
 
