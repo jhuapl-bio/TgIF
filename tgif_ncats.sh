@@ -278,6 +278,8 @@ if [[ "$SAMTOOLS" == "y" ]]; then
  
  	# make alignment archive (cannot direct to scidap igv since accessory reference genome files are not guaranteed when user-provided genome is used)
   	tar -zcf alignment_files.tar.gz $outdir/alignments/
+   	# clean up entire alignments dir
+    	rm -r $outdir/alignments
 fi
 
 
