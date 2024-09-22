@@ -169,7 +169,7 @@ runtime=$(date +"%Y%m%d%H%M%S%N")
 bni=$(basename "$TGIF")
 bnr=$(basename "$REF")
 indir=$(dirname "$TGIF")
-workdir="$indir/primer3_files"
+workdir="primer3_files"
 mkdir -p "$workdir"
 
 # ensure REF has no linebreaks among sequences
