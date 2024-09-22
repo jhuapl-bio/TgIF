@@ -377,10 +377,10 @@ done
 find "$outdir/alignments" -name "downselect-*.paf" -exec du -b {} + | sort -r | cut -f2 > "$outdir/alignments/parallel.dep"
 echo "generating 5'-3' depth file for..." >> "$outdir/log"
 >&2 echo "generating 5'-3' depth file for..."
-parallel --arg-file "$outdir/alignments/parallel.dep" --jobs="$THREADS" fdep > "$outdir/alignments/forward.dep"
+parallel --tmpdir "$outdir/sortmp" --arg-file "$outdir/alignments/parallel.dep" --jobs="$THREADS" fdep > "$outdir/alignments/forward.dep"
 echo "generating 3'-5' depth file for..." >> "$outdir/log"
 >&2 echo "generating 3'-5' depth file for..."
-parallel --arg-file "$outdir/alignments/parallel.dep" --jobs="$THREADS" rdep > "$outdir/alignments/reverse.dep"
+parallel --tmpdir "$outdir/sortmp" --arg-file "$outdir/alignments/parallel.dep" --jobs="$THREADS" rdep > "$outdir/alignments/reverse.dep"
 
 
 
