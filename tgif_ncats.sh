@@ -142,12 +142,12 @@ outdir="tgif_ncats-$bn"
 
 
 # check for compressed extensions and reassign FASTFILE, REF, and/or INSERT variables
-if [[ $(basename "$FASTFILE") == "bz2" ]]; then bzip2 -dc "$FASTFILE" > fastfile.txt; FASTFILE="fastfile.txt"; exit
-if [[ $(basename "$FASTFILE") == "gz" ]]; then gunzip -c "$FASTFILE" > fastfile.txt; FASTFILE="fastfile.txt"; exit
-if [[ $(basename "$REF") == "bz2" ]]; then bzip2 -dc "$REF" > ref.fa; REF="ref.fa"; exit
-if [[ $(basename "$REF") == "gz" ]]; then gunzip -c "$REF" > ref.fa; REF="ref.fa"; exit
-if [[ $(basename "$INSERT") == "bz2" ]]; then bzip2 -dc "$INSERT" > insert.fa; INSERT="insert.fa"; exit
-if [[ $(basename "$INSERT") == "gz" ]]; then gunzip -c "$INSERT" > insert.fa; INSERT="insert.fa"; exit
+if [[ $(basename "$FASTFILE" | sed 's/.*\.//') == "bz2" ]]; then bzip2 -dc "$FASTFILE" > fastfile.txt; FASTFILE="fastfile.txt"; exit
+if [[ $(basename "$FASTFILE" | sed 's/.*\.//') == "gz" ]]; then gunzip -c "$FASTFILE" > fastfile.txt; FASTFILE="fastfile.txt"; exit
+if [[ $(basename "$REF" | sed 's/.*\.//') == "bz2" ]]; then bzip2 -dc "$REF" > ref.fa; REF="ref.fa"; exit
+if [[ $(basename "$REF" | sed 's/.*\.//') == "gz" ]]; then gunzip -c "$REF" > ref.fa; REF="ref.fa"; exit
+if [[ $(basename "$INSERT" | sed 's/.*\.//') == "bz2" ]]; then bzip2 -dc "$INSERT" > insert.fa; INSERT="insert.fa"; exit
+if [[ $(basename "$INSERT" | sed 's/.*\.//') == "gz" ]]; then gunzip -c "$INSERT" > insert.fa; INSERT="insert.fa"; exit
 
 
 # only run if the 'mv' directory does not already exist
