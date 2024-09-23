@@ -137,10 +137,17 @@ bn=$(basename "$FASTFILE")
 
 
 
-# move outputs to FASTFILE input dir
+# make output dir in cwd
 outdir="tgif_ncats-$bn"
 
 
+# check for compressed extensions and reassign FASTFILE, REF, and/or INSERT variables
+if [[ $(basename "$FASTFILE") == "bz2" ]]; then bzip2 -dc "$FASTFILE" > fastfile.txt; FASTFILE="fastfile.txt"; exit
+if [[ $(basename "$FASTFILE") == "gz" ]]; then gunzip -c "$FASTFILE" > fastfile.txt; FASTFILE="fastfile.txt"; exit
+if [[ $(basename "$REF") == "bz2" ]]; then bzip2 -dc "$REF" > ref.fa; REF="ref.fa"; exit
+if [[ $(basename "$REF") == "gz" ]]; then gunzip -c "$REF" > ref.fa; REF="ref.fa"; exit
+if [[ $(basename "$INSERT") == "bz2" ]]; then bzip2 -dc "$INSERT" > insert.fa; INSERT="insert.fa"; exit
+if [[ $(basename "$INSERT") == "gz" ]]; then gunzip -c "$INSERT" > insert.fa; INSERT="insert.fa"; exit
 
 
 # only run if the 'mv' directory does not already exist
@@ -581,4 +588,8 @@ cat "$outdir/insertions_filtered.tgif"
 rm -r $outdir/alignments 2> /dev/null
 rm "$outdir/reads.fasta" 2> /dev/null
 rm $outdir/combined_insert_ref.fa* 2> /dev/null
+if [[ -f "fastfile.txt" ]]; then rm "fastfile.txt"; fi
+if [[ -f "ref.fa" ]]; then rm "ref.fa"; fi
+if [[ -f "insert.fa" ]]; then rm "insert.fa"; fi
+
 
