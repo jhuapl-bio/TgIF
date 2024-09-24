@@ -489,10 +489,13 @@ awk -F'\t' '{
 if [[ ! -s "$outdir/insertions_filter1.tsv" ]]; then
 	echo "	no probable insertion sites after filter1, exiting" >> "$outdir/log"
 	>&2 echo "	no probable insertion sites after filter1, exiting"
-	 # clean up large intermediate files not captured for scidap output
-	#rm -r $outdir/alignments 2> /dev/null
+	# clean up large intermediate files not captured for scidap output
+	rm -r $outdir/alignments 2> /dev/null
 	rm "$outdir/reads.fasta" 2> /dev/null
 	rm $outdir/combined_insert_ref.fa* 2> /dev/null
+	if [[ -f "fastfile.txt" ]]; then rm "fastfile.txt"; fi
+	if [[ -f "ref.fa" ]]; then rm "ref.fa"; fi
+	if [[ -f "insert.fa" ]]; then rm "insert.fa"; fi
 	exit
 fi
 
@@ -506,25 +509,38 @@ echo "filter2, checking strandedness of gap flanks..." >> "$outdir/log"
 #while read f; do gapstart=$(printf "$f" | cut -f2); awk -F'\t' -v gs="$gapstart" '{if(gs==$9+1){print($0)}}' alignments/downselect.paf; done < insertions_filter1.tsv
 #		neg reads
 #while read f; do gapend=$(printf "$f" | cut -f4); awk -F'\t' -v ge="$gapend" '{if(ge==$8+1){print($0)}}' alignments/downselect.paf; done < insertions_filter1.tsv
-awk -F'\t' '{
-	if(FNR==NR){
-		a[NR]=$1; b[NR]=$2; c[NR]=$3;
-		d[NR]=$4; e[NR]=$5; f[NR]=$6;
-	}else{
-		for(x in b){if(b[x]==$9+1){if($5=="+"){tot1[x]++; pos1[x]++}; if($5=="-"){tot1[x]++; neg1[x]++}}};
-		for(x in d){if(d[x]==$8+1){if($5=="+"){tot2[x]++; pos2[x]++}; if($5=="-"){tot2[x]++; neg2[x]++}}};
-	}
-}END{
-	for(x in b){
-		if(pos1[x]==""){pos1[x]=0}; if(tot1[x]==""){tot1[x]=0; ppr1[x]=0}else{ppr1[x]=pos1[x]/tot1[x]};
-		if(pos2[x]==""){pos2[x]=0}; if(tot2[x]==""){tot2[x]=0; ppr2[x]=0}else{ppr2[x]=pos2[x]/tot2[x]};
-		if(neg1[x]==""){neg1[x]=0}; if(tot1[x]==""){tot1[x]=0; npr1[x]=0}else{npr1[x]=neg1[x]/tot1[x]};
-		if(neg2[x]==""){neg2[x]=0}; if(tot2[x]==""){tot2[x]=0; npr2[x]=0}else{npr2[x]=neg2[x]/tot2[x]};
-		printf("%s\t%s\t%s\t%s,%s,%.4f\t%s,%s,%.4f\t%s\t%s\t%s,%s,%.4f\t%s,%s,%.4f\t%s\n", a[x], b[x], c[x], pos1[x], tot1[x], ppr1[x], neg1[x], tot1[x], npr1[x], d[x], e[x], pos2[x], tot2[x], ppr2[x], neg2[x], tot2[x], npr2[x], f[x]);
-	}
-}' <(grep -v "wee$" "$outdir/insertions_filter1.tsv") "$outdir/alignments/downselect.paf" > "$outdir/insertions_filter2.tsv"
-# check output
-#cat "$outdir/insertions_filter2.tsv"
+# first check that there are >wee probability sites for filter 2
+if [[ $(grep -v "wee$" "$outdir/insertions_filter1.tsv") != "" ]]; then
+	awk -F'\t' '{
+		if(FNR==NR){
+			a[NR]=$1; b[NR]=$2; c[NR]=$3;
+			d[NR]=$4; e[NR]=$5; f[NR]=$6;
+		}else{
+			for(x in b){if(b[x]==$9+1){if($5=="+"){tot1[x]++; pos1[x]++}; if($5=="-"){tot1[x]++; neg1[x]++}}};
+			for(x in d){if(d[x]==$8+1){if($5=="+"){tot2[x]++; pos2[x]++}; if($5=="-"){tot2[x]++; neg2[x]++}}};
+		}
+	}END{
+		for(x in b){
+			if(pos1[x]==""){pos1[x]=0}; if(tot1[x]==""){tot1[x]=0; ppr1[x]=0}else{ppr1[x]=pos1[x]/tot1[x]};
+			if(pos2[x]==""){pos2[x]=0}; if(tot2[x]==""){tot2[x]=0; ppr2[x]=0}else{ppr2[x]=pos2[x]/tot2[x]};
+			if(neg1[x]==""){neg1[x]=0}; if(tot1[x]==""){tot1[x]=0; npr1[x]=0}else{npr1[x]=neg1[x]/tot1[x]};
+			if(neg2[x]==""){neg2[x]=0}; if(tot2[x]==""){tot2[x]=0; npr2[x]=0}else{npr2[x]=neg2[x]/tot2[x]};
+			printf("%s\t%s\t%s\t%s,%s,%.4f\t%s,%s,%.4f\t%s\t%s\t%s,%s,%.4f\t%s,%s,%.4f\t%s\n", a[x], b[x], c[x], pos1[x], tot1[x], ppr1[x], neg1[x], tot1[x], npr1[x], d[x], e[x], pos2[x], tot2[x], ppr2[x], neg2[x], tot2[x], npr2[x], f[x]);
+		}
+	}' <(grep -v "wee$" "$outdir/insertions_filter1.tsv") "$outdir/alignments/downselect.paf" > "$outdir/insertions_filter2.tsv"
+else
+	echo "	no probable insertion sites after filter2, exiting" >> "$outdir/log"
+	>&2 echo "	no probable insertion sites after filter2, exiting"
+	# clean up large intermediate files not captured for scidap output
+	rm -r $outdir/alignments 2> /dev/null
+	rm "$outdir/reads.fasta" 2> /dev/null
+	rm $outdir/combined_insert_ref.fa* 2> /dev/null
+	if [[ -f "fastfile.txt" ]]; then rm "fastfile.txt"; fi
+	if [[ -f "ref.fa" ]]; then rm "ref.fa"; fi
+	if [[ -f "insert.fa" ]]; then rm "insert.fa"; fi
+	exit
+ fi
+
 
 
 echo "generating filtered list with confidence assignments..." >> "$outdir/log"
@@ -585,7 +601,7 @@ cat "$outdir/insertions_filtered.tgif"
 
 
 # clean up large intermediate files not captured for scidap output
-#rm -r $outdir/alignments 2> /dev/null
+rm -r $outdir/alignments 2> /dev/null
 rm "$outdir/reads.fasta" 2> /dev/null
 rm $outdir/combined_insert_ref.fa* 2> /dev/null
 if [[ -f "fastfile.txt" ]]; then rm "fastfile.txt"; fi
