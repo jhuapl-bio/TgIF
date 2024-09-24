@@ -490,7 +490,7 @@ if [[ ! -s "$outdir/insertions_filter1.tsv" ]]; then
 	echo "	no probable insertion sites after filter1, exiting" >> "$outdir/log"
 	>&2 echo "	no probable insertion sites after filter1, exiting"
 	 # clean up large intermediate files not captured for scidap output
-	rm -r $outdir/alignments 2> /dev/null
+	#rm -r $outdir/alignments 2> /dev/null
 	rm "$outdir/reads.fasta" 2> /dev/null
 	rm $outdir/combined_insert_ref.fa* 2> /dev/null
 	exit
@@ -585,7 +585,7 @@ cat "$outdir/insertions_filtered.tgif"
 
 
 # clean up large intermediate files not captured for scidap output
-rm -r $outdir/alignments 2> /dev/null
+#rm -r $outdir/alignments 2> /dev/null
 rm "$outdir/reads.fasta" 2> /dev/null
 rm $outdir/combined_insert_ref.fa* 2> /dev/null
 if [[ -f "fastfile.txt" ]]; then rm "fastfile.txt"; fi
